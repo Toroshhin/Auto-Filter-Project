@@ -170,40 +170,39 @@ window.onload = function() {
     },
   ];
 
-  const carBrands = document.querySelector('#brand');
-  const carModels = document.querySelector('#model');
-  const carModifications = document.querySelector('#modification');
-  const searchButton = document.querySelector('#button');
-
-
+  const carBrands = document.querySelector('.brand');
+  const carModels = document.querySelector('.model');
+  const carModifications = document.querySelector('.modification');
+  const searchButton = document.querySelector('.button');
 
   fillFormBrand(carBrands);
 
-
-
-
+  //Заполнение поля 'Модель' после выбора Марки
   let idBrand;
-
   carBrands.onchange = function() {
-    idBrand = carBrands.selectedIndex - 1;
-    fillFormModel(carModels, idBrand);
-    idModification = undefined;
-    cleaningForm('.modificationOption', carModifications.length);
-  }
-
+      idBrand = carBrands.selectedIndex - 1;
+      if (carBrands.value !== 'Марка') {
+        fillFormModel(carModels, idBrand);
+      } else {
+        cleaningElement('.modelOption', carModels.length - 1)
+      }
+      idModification = undefined;
+      cleaningElement('.modificationOption', carModifications.length - 1);
+    }
+    //Заполнение поля 'Модификация' после выбора Модели
   let idModel;
   carModels.onchange = function() {
-    idModel = carModels.selectedIndex - 1;
-    fillFormModification(carModifications, idBrand, idModel);
-    idModification = 0;
-  }
-
+      idModel = carModels.selectedIndex - 1;
+      fillFormModification(carModifications, idBrand, idModel);
+      idModification = 0;
+    }
+    //Считываение выбранного элемента в поле 'Модификация'
   let idModification;
   carModifications.onchange = function() {
     idModification = carModifications.selectedIndex - 1;
   }
 
-
+  //Вывод авто по клику
   searchButton.onclick = function() {
     if (idBrand !== undefined && idModel !== undefined && idModification !== undefined && carBrands.value !==
       'Марка' && carModels.value !== 'Модель' && carModifications.value !== 'Модификация') {
@@ -213,33 +212,33 @@ window.onload = function() {
   }
 
 
-
-  //Вывод данных из БД в select
+  //Заполнение поля 'Марка'
   function fillFormBrand(classBrand) {
     //Вывод брендов в select
     for (let i = 0; i < car.length; i++) {
-      let option = document.createElement('option');
+      const option = document.createElement('option');
       classBrand.append(option);
       option.className = 'brandOption';
       option.innerHTML = car[i].brand;
     }
   }
-
+  //Заполнение поля 'Модель'
   function fillFormModel(classmodel, idBrand) {
+    cleaningElement('.modelOption', carModels.length - 1);
     //Вывод моделей в select
     for (let i = 0; i < car[idBrand].models.length; i++) {
-      let option = document.createElement('option');
+      const option = document.createElement('option');
       classmodel.append(option);
       option.className = 'modelOption';
       option.innerHTML = car[idBrand].models[i].model;
     }
 
   }
-
+  //Заполнение поля 'Модификация'
   function fillFormModification(classModificatoin, idBrand, idModel) {
-    let formModificationLength = document.getElementsByClassName('modificationOption').length
+    let formModificationLength = document.getElementsByClassName('modificationOption').length;
     for (let i = 0; i < formModificationLength; i++) {
-      let formModification = document.querySelector('.modificationOption');
+      const formModification = document.querySelector('.modificationOption');
       formModification.remove();
     }
     //Вывод модицикаций в select
@@ -250,52 +249,48 @@ window.onload = function() {
       option.innerHTML = car[idBrand].models[idModel].modification[i];
     }
   }
-
-  function cleaningForm(className, listLength) {
+  //Очистка элементов
+  function cleaningElement(className, listLength) {
     for (let i = 0; i < listLength; i++) {
       let classForm = document.querySelector(className);
       classForm.remove();
     }
   }
 
-
   function upduteUI(idBrand, idModel, idModification) {
     //Удаление постов
-    let advLength = document.getElementsByClassName('advert').length
-    for (let i = 0; i < advLength; i++) {
-      let advert = document.querySelector('.advert');
-      advert.remove();
-    }
+    const advLength = document.getElementsByClassName('advert-list').length
+    cleaningElement('.advert-list', advLength);
 
     //Добавление поста
-    let ads = document.querySelector('.ads');
-    let div = document.createElement('div');
-    div.className = 'advert';
+    const ads = document.querySelector('.ads');
+    const div = document.createElement('div');
+    div.className = 'advert-list';
     ads.append(div);
 
     //Добавление картинки в пост
-    let img = document.createElement('img');
-    img.className = 'advert__img'
-    img.src = car[idBrand].models[idModel].photo[idModification];
-    div.append(img);
+    const imgCar = document.createElement('img');
+    imgCar.className = 'advert-list__img'
+    imgCar.src = car[idBrand].models[idModel].photo[idModification];
+    div.append(imgCar);
 
     //Добавление бренда в пост
-    var p = document.createElement('p');
-    p.className = 'advert__brand'
-    p.innerHTML = car[idBrand].brand;
-    div.append(p);
+    const textBrand = document.createElement('p');
+    textBrand.className = 'advert-list__brand'
+    textBrand.innerHTML = car[idBrand].brand;
+    div.append(textBrand);
 
     //Добавление модели в пост
-    var p = document.createElement('p');
-    p.className = 'advert__brand'
-    p.innerHTML = car[idBrand].models[idModel].model;
-    div.append(p);
+    const textModel = document.createElement('p');
+    textModel.className = 'advert-list__brand'
+    textModel.innerHTML = car[idBrand].models[idModel].model;
+    div.append(textModel);
 
     //Добавление модификации в пост
-    var span = document.createElement('span');
-    span.className = 'advert_modification'
+    const span = document.createElement('span');
+    span.className = 'advert-list__modification'
     span.innerHTML = ' (' + car[idBrand].models[idModel].modification[idModification] + ')';
-    p.append(span);
+    textModel.append(span);
 
 
   }
