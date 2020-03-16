@@ -1,4 +1,3 @@
-let idBrand;
 window.onload = function() {
 
   const car = [
@@ -171,32 +170,48 @@ window.onload = function() {
     },
   ];
 
-
   const carBrands = document.querySelector('#brand');
   const carModels = document.querySelector('#model');
   const carModifications = document.querySelector('#modification');
   const searchButton = document.querySelector('#button');
-  const brandOption = document.querySelectorAll('.brandOption');
 
 
-  brandOption.onclick = function() { console.log('gfdgfd'); }
 
-  document.addEventListener('click', function(e) {
-    if (e.target.classList.contains('brandOption')) {
-      console.log("lkg");
-    }
-  })
+  fillFormBrand(carBrands);
 
-  let idModel
-  carModels.addEventListener('click', function() {
-    idModel = carModels.selectedIndex;
-    fillFormModification(carModifications, idBrand, idModel)
-  });
+
+
+
+  let idBrand;
+
+  carBrands.onchange = function() {
+    idBrand = carBrands.selectedIndex - 1;
+    fillFormModel(carModels, idBrand);
+    idModification = undefined;
+    cleaningForm('.modificationOption', carModifications.length);
+  }
+
+  let idModel;
+  carModels.onchange = function() {
+    idModel = carModels.selectedIndex - 1;
+    fillFormModification(carModifications, idBrand, idModel);
+    idModification = 0;
+  }
 
   let idModification;
-  carModifications.addEventListener('click', function() {
-    idModification = carModifications.selectedIndex;
-  });
+  carModifications.onchange = function() {
+    idModification = carModifications.selectedIndex - 1;
+  }
+
+
+  searchButton.onclick = function() {
+    if (idBrand !== undefined && idModel !== undefined && idModification !== undefined && carBrands.value !==
+      'Марка' && carModels.value !== 'Модель' && carModifications.value !== 'Модификация') {
+      upduteUI(idBrand, idModel, idModification);
+    }
+
+  }
+
 
 
   //Вывод данных из БД в select
@@ -211,29 +226,40 @@ window.onload = function() {
   }
 
   function fillFormModel(classmodel, idBrand) {
-
     //Вывод моделей в select
     for (let i = 0; i < car[idBrand].models.length; i++) {
       let option = document.createElement('option');
       classmodel.append(option);
+      option.className = 'modelOption';
       option.innerHTML = car[idBrand].models[i].model;
     }
+
   }
 
   function fillFormModification(classModificatoin, idBrand, idModel) {
+    let formModificationLength = document.getElementsByClassName('modificationOption').length
+    for (let i = 0; i < formModificationLength; i++) {
+      let formModification = document.querySelector('.modificationOption');
+      formModification.remove();
+    }
     //Вывод модицикаций в select
     for (let i = 0; i < car[idBrand].models[idModel].modification.length; i++) {
       let option = document.createElement('option');
       classModificatoin.append(option);
+      option.className = 'modificationOption';
       option.innerHTML = car[idBrand].models[idModel].modification[i];
     }
   }
 
+  function cleaningForm(className, listLength) {
+    for (let i = 0; i < listLength; i++) {
+      let classForm = document.querySelector(className);
+      classForm.remove();
+    }
+  }
 
 
-
-
-  function upduteUI(idBrand, idModel) {
+  function upduteUI(idBrand, idModel, idModification) {
     //Удаление постов
     let advLength = document.getElementsByClassName('advert').length
     for (let i = 0; i < advLength; i++) {
@@ -241,42 +267,36 @@ window.onload = function() {
       advert.remove();
     }
 
-    for (i = 0; i < car[idBrand].models[idModel].modification.length; i++) {
+    //Добавление поста
+    let ads = document.querySelector('.ads');
+    let div = document.createElement('div');
+    div.className = 'advert';
+    ads.append(div);
 
-      //Добавление поста
-      let ads = document.querySelector('.ads');
-      let div = document.createElement('div');
-      div.className = 'advert';
-      ads.append(div);
+    //Добавление картинки в пост
+    let img = document.createElement('img');
+    img.className = 'advert__img'
+    img.src = car[idBrand].models[idModel].photo[idModification];
+    div.append(img);
 
-      //Добавление картинки в пост
-      let img = document.createElement('img');
-      img.className = 'advert__img'
-      img.src = car[idBrand].models[idModel].photo[i];
-      div.append(img);
+    //Добавление бренда в пост
+    var p = document.createElement('p');
+    p.className = 'advert__brand'
+    p.innerHTML = car[idBrand].brand;
+    div.append(p);
 
-      //Добавление бренда в пост
-      var p = document.createElement('p');
-      p.className = 'advert__brand'
-      p.innerHTML = car[idBrand].brand;
-      div.append(p);
+    //Добавление модели в пост
+    var p = document.createElement('p');
+    p.className = 'advert__brand'
+    p.innerHTML = car[idBrand].models[idModel].model;
+    div.append(p);
 
-      //Добавление модели в пост
-      var p = document.createElement('p');
-      p.className = 'advert__brand'
-      p.innerHTML = car[idBrand].models[idModel].model;
-      div.append(p);
+    //Добавление модификации в пост
+    var span = document.createElement('span');
+    span.className = 'advert_modification'
+    span.innerHTML = ' (' + car[idBrand].models[idModel].modification[idModification] + ')';
+    p.append(span);
 
-      //Добавление модификации в пост
-      var span = document.createElement('span');
-      span.className = 'advert_modification'
-      span.innerHTML = ' (' + car[idBrand].models[idModel].modification[i] + ')';
-      p.append(span);
-    }
 
   }
-
-  upduteUI(3, 4);
-
-  fillFormBrand(carBrands)
 }
